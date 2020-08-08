@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Crear nueva venta</title>
+</head>
+<body>
+    <div align="center">
+        <h1>Crear nueva Venta</h1>
+        <br />
+        <form action="#" th:action="@{/sendVenta}" th:object="${crearVenta}" method="post">
+ 
+            <table border="0" cellpadding="10">
+                <tr>
+                    <td>Código de la Venta:</td>
+                    <td><input type="text" th:field="*{idVenta}" /></td>
+                </tr>
+                <tr>
+                <!-- <tr>
+                    <td>Medio de Pago (Visa, Mastercard, Debito):</td>
+                    <td><input type="text" th:field="*{pago}" /></td>
+                </tr>  -->
+                <tr>
+                    <td>Cantidad de Productos:</td>
+                    <td><input type="text" th:field="*{cantidad}" /></td>
+                </tr>     
+                <tr>
+                    <td>Monto total:</td>
+                    <td><input type="text" th:field="*{precio}" /></td>
+                </tr>
+                <tr>
+                <td>Selecciona un medio de pago:
+                  <select  th:field="*{pago}">
+                  <option value="default">---</option> 
+                  <option th:value="Mastercard" th:text="Mastercard"/>
+                  <option th:value="VISA" th:text="VISA"/>
+                  <option th:value="Amex" th:text="Amex"/>
+                  <option th:value="Dinners" th:text="Dinners"/>
+                  <option th:value="Debito" th:text="Debito"/>
+                  <option th:value="Efectivo" th:text="Efectivo"/>
+                  </select></td>
+               </tr> 
+				
+                <tr>
+                    <td colspan="2"><button type="submit">Ingresar Venta</button> </td>
+                </tr>
+            </table>
+        </form>
+        <p th:if="${successMessage}" ></p>
+        <p th:if="${errorMessage}" class="error"></p>
+    </div>
+</body>
+</html>

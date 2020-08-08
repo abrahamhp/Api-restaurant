@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Insert title here</title>
+</head>
+<body>
+<div id="container" align="center"> 
+	<h2>API Ventas</h2>
+    <p th:text="${successMessage}" >
+    <p th:if="${errorMessage}" class="error"><font color="red">Intente nuevamente</font></p>
+    <br></br>
+    <a href="/volverMenu">Volver al Menu</a>
+</div>
+</body>
+</html>
