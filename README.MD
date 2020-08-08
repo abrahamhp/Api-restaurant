@@ -5,7 +5,7 @@ API para un restaurat como prueba técnica.
 
 ## Instrucciones:
 
-Para instalar la aplicacion, se debe realizar un git clone de este repositorio para descargarlo localmente.
+Para instalar la aplicacion, se debe realizar un git clone de este repositorio  https://github.com/abrahamhp/Api-restaurant.git , para descargarlo localmente.
 
 Luego de descargar la carpeta, debe Importar esta como proyecto Maven prefereiblemente en el IDE Spring Tool Suite 4.
 
