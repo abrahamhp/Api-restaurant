@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.support.converter.MappingJackson2MessageConverter;
@@ -29,8 +30,15 @@ import com.venta.domain.Venta;
 import com.venta.jms.Consumer;
 import com.venta.service.LoginService;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+
 @RestController
 @SessionAttributes("name")
+@RequestMapping("/")
+@Api(value = "ventas", description = "Operations pertaining to sales in Online API Restaurant", produces = MediaType.APPLICATION_JSON_VALUE)
 public class LoginController {
 
 	private static final Logger log = LoggerFactory.getLogger(LoginController.class);  
@@ -39,9 +47,14 @@ public class LoginController {
 	    LoginService service;
 	    
 	    @Autowired private JmsTemplate jmsTemplate;
-	    	  
 	    
-	    @RequestMapping(value="/login", method = RequestMethod.GET,  produces = MediaType.TEXT_HTML_VALUE)
+	    
+	    @ApiOperation(value = "Login to a Restaurant API Sales")
+		@ApiResponses(value = { @ApiResponse(code = 200, message = "Successfully retrieved "),
+		@ApiResponse(code = 401, message = "You are not authorized to view the resource"), 
+		@ApiResponse(code=  500, message="Internal Server Error"),
+		@ApiResponse(code = 404, message = "The resource you were trying to reach is not found") })
+	    @RequestMapping(value="/login", method = RequestMethod.GET,  produces = {MediaType.TEXT_HTML_VALUE, MediaType.APPLICATION_JSON_VALUE})
 	    public ModelAndView showLoginPage(ModelMap m,Model model,HttpServletRequest request,  
 	    		HttpServletResponse response) {
 
@@ -50,7 +63,10 @@ public class LoginController {
 	    	
 	    }
 	    
-	    
+	    @ApiResponses(value = { @ApiResponse(code = 200, message = "Successfully log in"),
+	   	@ApiResponse(code = 401, message = "You are not authorized to view the resource"), 
+	   	@ApiResponse(code=  500, message="Internal Server Error"),
+	   	@ApiResponse(code = 404, message = "The resource you were trying to reach is not found") })
 	    @PostMapping(value= "/login", produces = MediaType.TEXT_HTML_VALUE)
 	    public ModelAndView showMenuPage(@RequestParam String name, @RequestParam String password,ModelMap m, 
 	    		Model model, HttpServletRequest request, HttpServletResponse response) {
@@ -64,7 +80,7 @@ public class LoginController {
 	   			} 
 	   		   model.addAttribute("name", name);
 	   		   model.addAttribute("password", password);
-	   		   log.info("Bienvenido a la API del Restaurant Santiago");
+	   		   log.info("Bienvenido a la API del Restaurant Santiago", HttpStatus.OK);
     	     } catch (Exception e) {
 	 	            e.printStackTrace();
 	 	            log.error("Error inesperado en el login: "+ e.getMessage()); 
@@ -73,8 +89,8 @@ public class LoginController {
 	   		return new ModelAndView("menu");   	    
 		}
 	    
-	    
-	    @RequestMapping(value="/volverMenu", method = RequestMethod.GET,  produces = MediaType.TEXT_HTML_VALUE)
+	    @ApiOperation(value = "Show a API Dashboard")
+	    @RequestMapping(value="/volverMenu", method = RequestMethod.GET,  produces = {MediaType.TEXT_HTML_VALUE, MediaType.APPLICATION_JSON_VALUE})
 	    public ModelAndView showMenuPage(ModelMap m,Model model,HttpServletRequest request,  
 	    		HttpServletResponse response) {
 	    	model.addAttribute("login", new Login());
@@ -82,23 +98,28 @@ public class LoginController {
 	    }
 	    
 	    
-	    @RequestMapping(value="/crearVenta", method = RequestMethod.GET,  produces = MediaType.TEXT_HTML_VALUE)
+	    @ApiOperation(value = "Enter a sale")
+	    @RequestMapping(value="/crearVenta", method = RequestMethod.GET,  produces = {MediaType.TEXT_HTML_VALUE, MediaType.APPLICATION_JSON_VALUE})
 	    public ModelAndView ingresarVenta(ModelMap m,Model model,HttpServletRequest request,  
 	    		HttpServletResponse response) {
 	    	model.addAttribute("crearVenta", new Venta());
-	    	log.info("Ingrese datos de la venta");
+	    	log.info("Bienvenido a la pagina de Ingresar datos de la venta", HttpStatus.OK);
 	    	return new ModelAndView("crearVenta");    
 	    	
 	    }
 	    
-	        
-		@PostMapping(value = "/sendVenta", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE, produces = MediaType.TEXT_HTML_VALUE)
+	    
+	    @ApiOperation(value = "Add a sale")   
+	    @ApiResponses(value = { @ApiResponse(code = 200, message = "Successfully added sale"),
+	    @ApiResponse(code = 401, message = "You are not authorized to view the resource"), 
+	   	@ApiResponse(code=  500, message="Internal Server Error"),
+	   	@ApiResponse(code = 404, message = "The resource you were trying to reach is not found") })
+		@PostMapping(value = "/sendVenta", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE, produces = {MediaType.TEXT_HTML_VALUE, MediaType.APPLICATION_JSON_VALUE})
 	   	public ModelAndView sendVenta(@RequestParam int idVenta, 
-	        		     //         @RequestParam Date fecha,
-	        		              @RequestParam long precio, 
-	        		              @RequestParam String pago, 
-	        		              @RequestParam int cantidad, ModelMap m, Model model, HttpServletRequest request, 
-	        		              HttpServletResponse response) {
+	   								  @RequestParam long precio, 
+	        		                  @RequestParam String pago, 
+	        		                  @RequestParam int cantidad, ModelMap m, Model model, HttpServletRequest request, 
+	        		                  HttpServletResponse response) {
 	    	Date fecha = new Date();
 	    	//obtener la session
 	    	HttpSession mysession= request.getSession(true);
@@ -137,10 +158,11 @@ public class LoginController {
  	        			log.info("Hay ventas registradas en lista de sesión");
 	        			 
 	        		 }
-	        	    	        	  	  
-	        	    
+	        	    	        	  	     
 	        	    m.put("successMessage", "creacion de venta exitosa con codigo: "+ idVenta);
-	        	    log.info("creacion de venta exitosa con codigo: "+ idVenta);
+	        	    model.addAttribute("successMessage", "creacion de venta exitosa con codigo: "+ idVenta);
+	        	    
+	        	    log.info("creacion de venta exitosa con codigo: "+ idVenta, HttpStatus.OK);
 	        	    } catch (Exception e) {
 	 	            e.printStackTrace();
 	 	            log.error("Error en el proceso: "+ e.getMessage());
@@ -153,7 +175,12 @@ public class LoginController {
 	        	 return new ModelAndView("mensaje"); 
 	        }   
 	 
-	         
+	    
+	    @ApiOperation(value = "View a list of sales added", response = Iterable.class)
+		@ApiResponses(value = { @ApiResponse(code = 200, message = "Successfully retrieved list"),
+		@ApiResponse(code = 401, message = "You are not authorized to view the resource"), 
+		@ApiResponse(code=  500, message="Internal Server Error"),
+		@ApiResponse(code = 404, message = "The resource you were trying to reach is not found") })
 	    @RequestMapping(value = "/listaVenta",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
 	    public List<Venta> getVentas(ModelMap m, Model model, HttpServletRequest request, HttpServletResponse response){ 
 	   
@@ -161,7 +188,7 @@ public class LoginController {
 	    List<Venta> ventasdia= (List<Venta>) mysession.getAttribute("ventasSession");
 	   
 	    try {	    
-	    	 log.info("cantidad de ventas en lista:"+ventasdia.size());
+	    	 log.info("cantidad de ventas en lista:"+ventasdia.size(), HttpStatus.OK);
 	    }
 	    catch (Exception e) {
 	          e.printStackTrace();

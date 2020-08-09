@@ -29,6 +29,9 @@ Dependencias de :
 -Artemis JMS- ActiveMQ
 -HTML Thymeleaf
 
+Documentacion de la API Restaurant en Swagger:
+http://localhost:8088/swagger-ui.html
+
 
 
 #Abraham Hernandez

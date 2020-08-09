@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 
 
 @SpringBootApplication
-@ComponentScan(basePackages = {"com.venta.controller", "com.venta.service", "com.venta.domain", "com.venta.jms"})
+@ComponentScan(basePackages = {"com.venta.controller", "com.venta.service", "com.venta.domain", "com.venta.jms", "com.venta.config"})
 public class ApiventaApplication {
 	private static final Logger log = LoggerFactory.getLogger(ApiventaApplication.class);
 		
@@ -39,6 +39,7 @@ public class ApiventaApplication {
 
 	public static void main(String[] args) {
 				SpringApplication.run(ApiventaApplication.class, args);
+				log.info("Iniciando API de Ventas de Restaurant Santiago");
 	}
 		
 	
