@@ -55,7 +55,7 @@ public class LoginController {
 		@ApiResponse(code=  500, message="Internal Server Error"),
 		@ApiResponse(code = 404, message = "The resource you were trying to reach is not found") })
 	    @RequestMapping(value="/login", method = RequestMethod.GET,  produces = {MediaType.TEXT_HTML_VALUE, MediaType.APPLICATION_JSON_VALUE})
-	    public ModelAndView showLoginPage(ModelMap m,Model model,HttpServletRequest request,  
+	    public ModelAndView showLoginPage(Model model,HttpServletRequest request,  
 	    		HttpServletResponse response) {
 
 	    	model.addAttribute("login", new Login());
@@ -68,13 +68,13 @@ public class LoginController {
 	   	@ApiResponse(code=  500, message="Internal Server Error"),
 	   	@ApiResponse(code = 404, message = "The resource you were trying to reach is not found") })
 	    @PostMapping(value= "/login", produces = MediaType.TEXT_HTML_VALUE)
-	    public ModelAndView showMenuPage(@RequestParam String name, @RequestParam String password,ModelMap m, 
+	    public ModelAndView showMenuPage(@RequestParam String name, @RequestParam String password,
 	    		Model model, HttpServletRequest request, HttpServletResponse response) {
     	 try {
     	    	 boolean isValidUser = service.validateUser(name, password);
 	   		 	 if (!isValidUser) {
 	   		 	   model.addAttribute("login", new Login());
-	   			   m.put("errorMessage", "Credenciales Invalidas");
+	   			   model.addAttribute("errorMessage", "Credenciales Invalidas");
 	   			   log.warn("Error de ingreso- credenciales incorrectas");
 	   			  return new ModelAndView("login"); 
 	   			} 
@@ -91,7 +91,7 @@ public class LoginController {
 	    
 	    @ApiOperation(value = "Show a API Dashboard")
 	    @RequestMapping(value="/volverMenu", method = RequestMethod.GET,  produces = {MediaType.TEXT_HTML_VALUE, MediaType.APPLICATION_JSON_VALUE})
-	    public ModelAndView showMenuPage(ModelMap m,Model model,HttpServletRequest request,  
+	    public ModelAndView showMenuPage(Model model,HttpServletRequest request,  
 	    		HttpServletResponse response) {
 	    	model.addAttribute("login", new Login());
 	    	return new ModelAndView("menu");
@@ -100,7 +100,7 @@ public class LoginController {
 	    
 	    @ApiOperation(value = "Enter a sale")
 	    @RequestMapping(value="/crearVenta", method = RequestMethod.GET,  produces = {MediaType.TEXT_HTML_VALUE, MediaType.APPLICATION_JSON_VALUE})
-	    public ModelAndView ingresarVenta(ModelMap m,Model model,HttpServletRequest request,  
+	    public ModelAndView ingresarVenta(Model model,HttpServletRequest request,  
 	    		HttpServletResponse response) {
 	    	model.addAttribute("crearVenta", new Venta());
 	    	log.info("Bienvenido a la pagina de Ingresar datos de la venta", HttpStatus.OK);
@@ -159,7 +159,7 @@ public class LoginController {
 	        			 
 	        		 }
 	        	    	        	  	     
-	        	    m.put("successMessage", "creacion de venta exitosa con codigo: "+ idVenta);
+	        	    //m.put("successMessage", "creacion de venta exitosa con codigo: "+ idVenta);
 	        	    model.addAttribute("successMessage", "creacion de venta exitosa con codigo: "+ idVenta);
 	        	    
 	        	    log.info("creacion de venta exitosa con codigo: "+ idVenta, HttpStatus.OK);
@@ -182,7 +182,7 @@ public class LoginController {
 		@ApiResponse(code=  500, message="Internal Server Error"),
 		@ApiResponse(code = 404, message = "The resource you were trying to reach is not found") })
 	    @RequestMapping(value = "/listaVenta",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
-	    public List<Venta> getVentas(ModelMap m, Model model, HttpServletRequest request, HttpServletResponse response){ 
+	    public List<Venta> getVentas(Model model, HttpServletRequest request, HttpServletResponse response){ 
 	   
 	    HttpSession mysession= (HttpSession) request.getSession();
 	    List<Venta> ventasdia= (List<Venta>) mysession.getAttribute("ventasSession");
