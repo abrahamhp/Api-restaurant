@@ -44,6 +44,7 @@ public class LoginController {
 	    @RequestMapping(value="/login", method = RequestMethod.GET,  produces = MediaType.TEXT_HTML_VALUE)
 	    public ModelAndView showLoginPage(ModelMap m,Model model,HttpServletRequest request,  
 	    		HttpServletResponse response) {
+
 	    	model.addAttribute("login", new Login());
 	    	return new ModelAndView("login");    
 	    	
@@ -53,18 +54,23 @@ public class LoginController {
 	    @PostMapping(value= "/login", produces = MediaType.TEXT_HTML_VALUE)
 	    public ModelAndView showMenuPage(@RequestParam String name, @RequestParam String password,ModelMap m, 
 	    		Model model, HttpServletRequest request, HttpServletResponse response) {
-    	    
-	    	    boolean isValidUser = service.validateUser(name, password);
-	   		 	if (!isValidUser) {
-	   		 	 model.addAttribute("login", new Login());
-	   			 m.put("errorMessage", "Credenciales Invalidas");
-	   			 log.warn("Error de ingreso- credenciales incorrectas");
-	   			 return new ModelAndView("login"); 
+    	 try {
+    	    	 boolean isValidUser = service.validateUser(name, password);
+	   		 	 if (!isValidUser) {
+	   		 	   model.addAttribute("login", new Login());
+	   			   m.put("errorMessage", "Credenciales Invalidas");
+	   			   log.warn("Error de ingreso- credenciales incorrectas");
+	   			  return new ModelAndView("login"); 
 	   			} 
-	   		 model.addAttribute("name", name);
-	   		 model.addAttribute("password", password);
-	   		 log.info("Bienvenido a la API del Restaurant Santiago");
-	   		return new ModelAndView("menu");    
+	   		   model.addAttribute("name", name);
+	   		   model.addAttribute("password", password);
+	   		   log.info("Bienvenido a la API del Restaurant Santiago");
+    	     } catch (Exception e) {
+	 	            e.printStackTrace();
+	 	            log.error("Error inesperado en el login: "+ e.getMessage()); 
+    	    	 
+    	     }
+	   		return new ModelAndView("menu");   	    
 		}
 	    
 	    
@@ -96,16 +102,11 @@ public class LoginController {
 	    	Date fecha = new Date();
 	    	//obtener la session
 	    	HttpSession mysession= request.getSession(true);
-	    	List<Venta> ventas= new ArrayList<Venta>();
+	    	List<Venta> ventas=(List<Venta>) mysession.getAttribute("ventasSession");
+	    	  
 	    	//asignarlo a lista de ventas
 	    	
-	        try {
-	        	
-	        	  if (!mysession.isNew()) {
-	  	    		ventas=  (List<Venta>) mysession.getAttribute("ventasSession");	        	
-	  	    		 log.info("Ventas registradas en sesión");
-	  	    	  }
-	        	  
+	        	 try {       	        		 	        	  
 					  Venta venta = new Venta();
 					  venta.setIdVenta(idVenta);
 					  venta.setFecha(fecha);
@@ -117,17 +118,30 @@ public class LoginController {
 					  model.addAttribute("precio", precio);
 					  model.addAttribute("pago", pago); 
 					  model.addAttribute("cantidad", cantidad);
-					  log.info("Registro de venta: idVenta: {}, fecha: {}, precio: {}, pago:{}, cantidad:{} ", idVenta,fecha,precio,pago,cantidad);        	    
-	        	    
-					  ventas.add(venta);	        	    
-					  mysession.setAttribute("ventasSession",ventas);	        	    	        	    	        	    
-					  model.addAttribute("successMessage", "Creacion exitosa de venta con código: "+idVenta);
+					  log.info("Registro de venta: idVenta: {}, fecha: {}, precio: {}, pago:{}, cantidad:{} ", idVenta,fecha,precio,pago,cantidad);        	    	        	    	        	    	        	    				  
+					 
+					  
 	        	    
 	        	    log.info("Enviando mensaje a la cola de ventas ...");
 	        	    jmsTemplate.convertAndSend("ventaQueue", venta);
 	        	    
-	        	    m.put("successMessage", "creacion de venta exitosa: "+ idVenta);
-	        	 } catch (Exception e) {
+	        	    
+	        	    if (null == ventas || ventas.isEmpty()) {
+	        	    	List<Venta>	ventasNueva = new ArrayList<Venta>();
+	        	    	ventasNueva.add(venta);
+	        	    	mysession.setAttribute("ventasSession",ventasNueva);
+	        	    	log.info("No hay ventas registradas aun en lista de sesión");
+ 	        		 } else {
+ 	        			ventas.add(venta);
+ 	        			mysession.setAttribute("ventasSession",ventas);
+ 	        			log.info("Hay ventas registradas en lista de sesión");
+	        			 
+	        		 }
+	        	    	        	  	  
+	        	    
+	        	    m.put("successMessage", "creacion de venta exitosa con codigo: "+ idVenta);
+	        	    log.info("creacion de venta exitosa con codigo: "+ idVenta);
+	        	    } catch (Exception e) {
 	 	            e.printStackTrace();
 	 	            log.error("Error en el proceso: "+ e.getMessage());
 	 	            m.put("errorMessage", "Error al ingresar la venta");
